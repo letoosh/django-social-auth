@@ -1,12 +1,18 @@
 """Django ORM models for Social Auth"""
 from django.db import models
-from django.db.models.loading import get_model
 from django.db.utils import IntegrityError
 
 from social_auth.db.base import UserSocialAuthMixin, AssociationMixin, \
                                 NonceMixin
-from social_auth.fields import JSONField
 from social_auth.utils import setting
+from jsonfield import JSONField
+
+
+try:
+    from django.db.models.loading import get_model
+except ImportError:
+    from django.apps import apps
+    get_model = apps.get_model
 
 
 # If User class is overridden, it *must* provide the following fields
@@ -37,7 +43,7 @@ class UserSocialAuth(models.Model, UserSocialAuthMixin):
     user = models.ForeignKey(USER_MODEL, related_name='social_auth')
     provider = models.CharField(max_length=32)
     uid = models.CharField(max_length=UID_LENGTH)
-    extra_data = JSONField(default='{}')
+    extra_data = JSONField(default={})
 
     class Meta:
         """Meta data"""

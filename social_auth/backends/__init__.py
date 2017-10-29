@@ -27,7 +27,7 @@ except ImportError:
         from django.utils import simplejson
 
 from django.contrib.auth import authenticate
-from django.utils.importlib import import_module
+from importlib import import_module
 
 from social_auth.models import UserSocialAuth
 from social_auth.utils import setting, model_to_ctype, ctype_to_model, \
@@ -103,6 +103,9 @@ class SocialAuthBackend(object):
         pipeline = PIPELINE
         kwargs = kwargs.copy()
         kwargs['backend'] = self
+
+        args = list(args)
+        kwargs['request'] = args.pop()
 
         if 'pipeline_index' in kwargs:
             pipeline = pipeline[kwargs['pipeline_index']:]
@@ -345,7 +348,7 @@ class BaseAuth(object):
         self.request = request
         # Use request because some auth providers use POST urls with needed
         # GET parameters on it
-        self.data = request.REQUEST
+        self.data = request.GET
         self.redirect = redirect
 
     def auth_url(self):
